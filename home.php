@@ -315,3 +315,29 @@ if ($page === 'cart') {
         $cartTotal += ((float)$it['price']) * ((int)$it['quantity']);
     }
 }
+
+// Orders
+$orders = [];
+if ($page === 'orders') {
+    $stmt = mysqli_prepare($conn, "SELECT id, status, total, note, created_at FROM orders WHERE user_id=? ORDER BY created_at DESC LIMIT 50");
+    mysqli_stmt_bind_param($stmt, "i", $userId);
+    mysqli_stmt_execute($stmt);
+    $orders = stmt_fetch_all($stmt);
+    mysqli_stmt_close($stmt);
+}
+
+$adminOrders = [];
+if ($page === 'admin' && isAdmin()) {
+    $stmt = mysqli_prepare($conn, "
+        SELECT o.id, o.status, o.total, o.note, o.created_at,
+               u.full_name AS user_name,
+               u.email     AS user_email
+        FROM orders o
+        JOIN users u ON u.id = o.user_id
+        ORDER BY o.created_at DESC
+        LIMIT 20
+    ");
+    mysqli_stmt_execute($stmt);
+    $adminOrders = stmt_fetch_all($stmt);
+    mysqli_stmt_close($stmt);
+}
