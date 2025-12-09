@@ -19,6 +19,7 @@ function stmt_fetch_all(mysqli_stmt $stmt): array {
     while ($row = mysqli_fetch_assoc($res)) $rows[] = $row;
     return $rows;
 }
+
 /** =========================
  *  POST ACTIONS (CSRF + prepared statements)
  *  ========================= */
