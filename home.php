@@ -20,6 +20,16 @@ function stmt_fetch_all(mysqli_stmt $stmt): array {
     return $rows;
 }
 
+/** =========================
+ *  POST ACTIONS (CSRF + prepared statements)
+ *  ========================= */
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $token = $_POST['csrf_token'] ?? '';
+    if (!csrf_validate($token)) {
+        $errors[] = "CSRF token không hợp lệ. Vui lòng tải lại trang.";
+    } else {
+        $action = $_POST['action'] ?? '';
+
         /** ---- USER: REMOVE CART ---- */
         if ($action === 'remove_cart') {
             $cartId = (int)($_POST['cart_id'] ?? 0);
