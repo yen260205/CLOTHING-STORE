@@ -291,3 +291,27 @@ if ($page === 'products' || $page === 'admin') {
     }
     $products = array_values($map);
 }
+
+// Cart items
+$cartItems = [];
+$cartTotal = 0.0;
+if ($page === 'cart') {
+    $stmt = mysqli_prepare($conn, "
+        SELECT c.id AS cart_id, c.quantity,
+               v.id AS variant_id, v.size, v.color, v.stock,
+               p.id AS product_id, p.name, p.price, p.image
+        FROM cart c
+        JOIN product_variants v ON v.id = c.product_variant_id
+        JOIN products p ON p.id = v.product_id
+        WHERE c.user_id = ?
+        ORDER BY c.updated_at DESC
+    ");
+    mysqli_stmt_bind_param($stmt, "i", $userId);
+    mysqli_stmt_execute($stmt);
+    $cartItems = stmt_fetch_all($stmt);
+    mysqli_stmt_close($stmt);
+
+    foreach ($cartItems as $it) {
+        $cartTotal += ((float)$it['price']) * ((int)$it['quantity']);
+    }
+}
