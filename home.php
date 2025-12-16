@@ -367,3 +367,60 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         }
                     }
                 }
+
+                if ($action === 'admin_update_product') {
+                    $productId = (int)($_POST['product_id'] ?? 0);
+                    $name = trim($_POST['name'] ?? '');
+                    $price = (float)($_POST['price'] ?? 0);
+                    $type = trim($_POST['type'] ?? '');
+                    $brand = trim($_POST['brand'] ?? '');
+                    $description = trim($_POST['description'] ?? '');
+
+                    if ($productId <= 0) $errors[] = "Product không hợp lệ.";
+                    if ($name === '') $errors[] = "Tên sản phẩm không được để trống.";
+                    if ($price < 0) $errors[] = "Giá không hợp lệ.";
+
+                    $newImage = null;
+                    if (empty($errors)) {
+                        $newImage = save_uploaded_image('product_image', $errors); // optional
+                    }
+
+                    if (empty($errors)) {
+                        try {
+                            // fetch old image if replacing
+                            $oldImage = null;
+                            if ($newImage) {
+                                $stmt = mysqli_prepare($conn, "SELECT image FROM products WHERE id = ? LIMIT 1");
+                                mysqli_stmt_bind_param($stmt, "i", $productId);
+                                mysqli_stmt_execute($stmt);
+                                $r = mysqli_fetch_assoc(mysqli_stmt_get_result($stmt));
+                                mysqli_stmt_close($stmt);
+                                $oldImage = $r['image'] ?? null;
+                            }
+
+                            if ($newImage) {
+                                $stmt = mysqli_prepare($conn, "UPDATE products SET name=?, price=?, image=?, description=?, type=?, brand=? WHERE id=?");
+                                mysqli_stmt_bind_param($stmt, "sdssssi", $name, $price, $newImage, $description, $type, $brand, $productId);
+                            } else {
+                                $stmt = mysqli_prepare($conn, "UPDATE products SET name=?, price=?, description=?, type=?, brand=? WHERE id=?");
+                                mysqli_stmt_bind_param($stmt, "sdsssi", $name, $price, $description, $type, $brand, $productId);
+                            }
+                            mysqli_stmt_execute($stmt);
+                            mysqli_stmt_close($stmt);
+
+                            // best-effort delete old file
+                            if ($newImage && $oldImage && str_starts_with($oldImage, 'uploads/')) {
+                                $oldFull = realpath(__DIR__ . '/' . $oldImage);
+                                $uploadsFull = realpath(__DIR__ . '/uploads');
+                                if ($oldFull && $uploadsFull && str_starts_with($oldFull, $uploadsFull)) {
+                                    @unlink($oldFull);
+                                }
+                            }
+
+                            $success = "Đã cập nhật product (#$productId).";
+                            $page = 'admin';
+                        } catch (Exception $e) {
+                            $errors[] = "Cập nhật product thất bại: " . $e->getMessage();
+                        }
+                    }
+                }
