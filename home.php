@@ -631,3 +631,32 @@ if ($page === 'admin' && isAdmin()) {
     $adminOrders = stmt_fetch_all($stmt);
     mysqli_stmt_close($stmt);
 }
+
+?>
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Clothing Store</title>
+    <style>
+      *{box-sizing:border-box}
+      html, body { height: 100%; }
+
+      body{
+        margin: 0;
+        color: #e7eaf0;
+        font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+
+        background-color: #0b1220; /* fallback khi ảnh lỗi */
+        background-image: url("images/background_home3.jpg");
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+      }
+
+      a{
+        color:inherit;
+        text-decoration:none
+      }
