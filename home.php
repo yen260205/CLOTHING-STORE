@@ -316,3 +316,54 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 }
+
+        /** ---- ADMIN ACTIONS ---- */
+        if (strpos($action, 'admin_') === 0) {
+            if (!isAdmin()) {
+                $errors[] = "Bạn không có quyền admin.";
+            } else {
+
+                if ($action === 'admin_add_product') {
+                    $name = trim($_POST['name'] ?? '');
+                    $price = (float)($_POST['price'] ?? 0);
+                    $type = trim($_POST['type'] ?? '');
+                    $brand = trim($_POST['brand'] ?? '');
+                    $description = trim($_POST['description'] ?? '');
+                    $size = trim($_POST['size'] ?? '');
+                    $color = trim($_POST['color'] ?? '');
+                    $stock = (int)($_POST['stock'] ?? 0);
+
+                    if ($name === '') $errors[] = "Tên sản phẩm không được để trống.";
+                    if ($price < 0) $errors[] = "Giá không hợp lệ.";
+                    if ($size === '' || $color === '') $errors[] = "Variant size/color không được để trống.";
+                    if ($stock < 0) $errors[] = "Stock không hợp lệ.";
+
+                    $imagePath = null;
+                    if (empty($errors)) {
+                        $imagePath = save_uploaded_image('product_image', $errors);
+                    }
+
+                    if (empty($errors)) {
+                        mysqli_begin_transaction($conn);
+                        try {
+                            $stmt = mysqli_prepare($conn, "INSERT INTO products (name, price, image, description, type, brand) VALUES (?,?,?,?,?,?)");
+                            mysqli_stmt_bind_param($stmt, "sdssss", $name, $price, $imagePath, $description, $type, $brand);
+                            mysqli_stmt_execute($stmt);
+                            mysqli_stmt_close($stmt);
+
+                            $newProductId = (int)mysqli_insert_id($conn);
+
+                            $stmt = mysqli_prepare($conn, "INSERT INTO product_variants (product_id, size, color, stock) VALUES (?,?,?,?)");
+                            mysqli_stmt_bind_param($stmt, "issi", $newProductId, $size, $color, $stock);
+                            mysqli_stmt_execute($stmt);
+                            mysqli_stmt_close($stmt);
+
+                            mysqli_commit($conn);
+                            $success = "Đã thêm product (#$newProductId) + variant ($size/$color).";
+                            $page = 'admin';
+                        } catch (Exception $e) {
+                            mysqli_rollback($conn);
+                            $errors[] = "Thêm product thất bại: " . $e->getMessage();
+                        }
+                    }
+                }
