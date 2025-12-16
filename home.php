@@ -78,3 +78,10 @@ function save_uploaded_image(string $field, array &$errors): ?string {
     return 'uploads/' . $filename;
 }
 
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $token = $_POST['csrf_token'] ?? '';
+    if (!csrf_validate($token)) {
+        $errors[] = "CSRF token không hợp lệ. Vui lòng tải lại trang.";
+    } else {
+        $action = $_POST['action'] ?? '';
+
