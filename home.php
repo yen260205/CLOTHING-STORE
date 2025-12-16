@@ -45,3 +45,17 @@ function save_uploaded_image(string $field, array &$errors): ?string {
         $errors[] = "File upload không hợp lệ.";
         return null;
     }
+ $finfo = finfo_open(FILEINFO_MIME_TYPE);
+    $mime = $finfo ? finfo_file($finfo, $tmp) : null;
+    if ($finfo) finfo_close($finfo);
+
+    $extMap = [
+        'image/jpeg' => 'jpg',
+        'image/png'  => 'png',
+        'image/webp' => 'webp',
+        'image/gif'  => 'gif',
+    ];
+    if (!$mime || !isset($extMap[$mime])) {
+        $errors[] = "Định dạng ảnh không được hỗ trợ (jpg/png/webp/gif).";
+        return null;
+    }
