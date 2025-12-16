@@ -424,3 +424,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         }
                     }
                 }
+
+                if ($action === 'admin_delete_product') {
+                    $productId = (int)($_POST['product_id'] ?? 0);
+                    if ($productId <= 0) {
+                        $errors[] = "Product không hợp lệ.";
+                    } else {
+                        try {
+                            $stmt = mysqli_prepare($conn, "DELETE FROM products WHERE id = ?");
+                            mysqli_stmt_bind_param($stmt, "i", $productId);
+                            mysqli_stmt_execute($stmt);
+                            $aff = mysqli_stmt_affected_rows($stmt);
+                            mysqli_stmt_close($stmt);
+
+                            if ($aff !== 1) {
+                                $errors[] = "Không xoá được product (có thể không tồn tại).";
+                            } else {
+                                $success = "Đã xoá product (#$productId).";
+                                $page = 'admin';
+                            }
+                        } catch (Exception $e) {
+                            $errors[] = "Xoá product thất bại: " . $e->getMessage();
+                        }
+                    }
+                }
