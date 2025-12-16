@@ -605,3 +605,13 @@ if ($page === 'cart') {
         $cartTotal += ((float)$it['price']) * ((int)$it['quantity']);
     }
 }
+
+// Orders
+$orders = [];
+if ($page === 'orders') {
+    $stmt = mysqli_prepare($conn, "SELECT id, status, total, note, created_at FROM orders WHERE user_id=? ORDER BY created_at DESC LIMIT 50");
+    mysqli_stmt_bind_param($stmt, "i", $userId);
+    mysqli_stmt_execute($stmt);
+    $orders = stmt_fetch_all($stmt);
+    mysqli_stmt_close($stmt);
+}
