@@ -448,3 +448,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         }
                     }
                 }
+
+                if ($action === 'admin_add_variant') {
+                    $productId = (int)($_POST['product_id'] ?? 0);
+                    $size = trim($_POST['size'] ?? '');
+                    $color = trim($_POST['color'] ?? '');
+                    $stock = (int)($_POST['stock'] ?? 0);
+
+                    if ($productId <= 0) $errors[] = "Product không hợp lệ.";
+                    if ($size === '' || $color === '') $errors[] = "Size/color không được để trống.";
+                    if ($stock < 0) $errors[] = "Stock không hợp lệ.";
+
+                    if (empty($errors)) {
+                        try {
+                            $stmt = mysqli_prepare($conn, "INSERT INTO product_variants (product_id, size, color, stock) VALUES (?,?,?,?)");
+                            mysqli_stmt_bind_param($stmt, "issi", $productId, $size, $color, $stock);
+                            mysqli_stmt_execute($stmt);
+                            mysqli_stmt_close($stmt);
+
+                            $success = "Đã thêm variant ($size/$color) cho product #$productId.";
+                            $page = 'admin';
+                        } catch (Exception $e) {
+                            $errors[] = "Thêm variant thất bại: " . $e->getMessage();
+                        }
+                    }
+                }
