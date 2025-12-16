@@ -532,3 +532,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
             }
         }
+
+
+
+/** =========================
+ *  DATA FETCH FOR PAGES
+ *  ========================= */
+
+// Products + variants (grouped)
+$products = [];
+if ($page === 'products' || $page === 'admin') {
+    $orderBy = ($page === 'admin' && isAdmin())
+        ? "ORDER BY p.id ASC, v.size ASC, v.color ASC"
+        : "ORDER BY p.created_at DESC, v.size ASC, v.color ASC";
+
+    $sql = "
+        SELECT p.id AS product_id, p.name, p.price, p.image, p.description, p.type, p.brand, p.created_at,
+               v.id AS variant_id, v.size, v.color, v.stock
+        FROM products p
+        LEFT JOIN product_variants v ON v.product_id = p.id
+        $orderBy
+    ";
+    $res = mysqli_query($conn, $sql);
+    $map = [];
+    while ($r = mysqli_fetch_assoc($res)) {
+        $pid = (int)$r['product_id'];
+        if (!isset($map[$pid])) {
+            $map[$pid] = [
