@@ -83,5 +83,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!csrf_validate($token)) {
         $errors[] = "CSRF token không hợp lệ. Vui lòng tải lại trang.";
     } else {
-        $action = $_POST['action'] ?? '';
+        $action = $_POST['action'] ?? ''; 
+     
 
