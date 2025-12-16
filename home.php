@@ -11,3 +11,11 @@ $page = in_array($page, ['products', 'cart', 'orders', 'admin'], true) ? $page :
 
 $errors = [];
 $success = '';
+
+function stmt_fetch_all(mysqli_stmt $stmt): array {
+    $res = mysqli_stmt_get_result($stmt);
+    if (!$res) return [];
+    $rows = [];
+    while ($row = mysqli_fetch_assoc($res)) $rows[] = $row;
+    return $rows;
+}
