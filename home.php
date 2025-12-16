@@ -473,3 +473,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         }
                     }
                 }
+
+                if ($action === 'admin_update_variant') {
+                    $variantId = (int)($_POST['variant_id'] ?? 0);
+                    $productId = (int)($_POST['product_id'] ?? 0);
+                    $size = trim($_POST['size'] ?? '');
+                    $color = trim($_POST['color'] ?? '');
+                    $stock = (int)($_POST['stock'] ?? 0);
+
+                    if ($variantId <= 0 || $productId <= 0) $errors[] = "Variant/Product không hợp lệ.";
+                    if ($size === '' || $color === '') $errors[] = "Size/color không được để trống.";
+                    if ($stock < 0) $errors[] = "Stock không hợp lệ.";
+
+                    if (empty($errors)) {
+                        try {
+                            $stmt = mysqli_prepare($conn, "UPDATE product_variants SET size=?, color=?, stock=? WHERE id=? AND product_id=?");
+                            mysqli_stmt_bind_param($stmt, "ssiii", $size, $color, $stock, $variantId, $productId);
+                            mysqli_stmt_execute($stmt);
+                            $aff = mysqli_stmt_affected_rows($stmt);
+                            mysqli_stmt_close($stmt);
+
+                            if ($aff < 0) {
+                                $errors[] = "Cập nhật variant thất bại.";
+                            } else {
+                                $success = "Đã cập nhật variant #$variantId.";
+                                $page = 'admin';
+                            }
+                        } catch (Exception $e) {
+                            $errors[] = "Cập nhật variant thất bại: " . $e->getMessage();
+                        }
+                    }
+                }
