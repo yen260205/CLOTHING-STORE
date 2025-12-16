@@ -59,3 +59,22 @@ function save_uploaded_image(string $field, array &$errors): ?string {
         $errors[] = "Định dạng ảnh không được hỗ trợ (jpg/png/webp/gif).";
         return null;
     }
+  $uploadDir = __DIR__ . '/uploads';
+    if (!is_dir($uploadDir)) {
+        if (!mkdir($uploadDir, 0755, true)) {
+            $errors[] = "Không tạo được thư mục uploads.";
+            return null;
+        }
+    }
+
+    $filename = 'p_' . bin2hex(random_bytes(8)) . '.' . $extMap[$mime];
+    $dest = $uploadDir . '/' . $filename;
+
+    if (!move_uploaded_file($tmp, $dest)) {
+        $errors[] = "Lưu ảnh thất bại.";
+        return null;
+    }
+
+    return 'uploads/' . $filename;
+}
+
