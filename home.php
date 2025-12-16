@@ -559,3 +559,25 @@ if ($page === 'products' || $page === 'admin') {
         $pid = (int)$r['product_id'];
         if (!isset($map[$pid])) {
             $map[$pid] = [
+                'id' => $pid,
+                'name' => $r['name'],
+                'price' => (float)$r['price'],
+                'image' => $r['image'],
+                'description' => $r['description'],
+                'type' => $r['type'],
+                'brand' => $r['brand'],
+                'created_at' => $r['created_at'],
+                'variants' => []
+            ];
+        }
+        if (!empty($r['variant_id'])) {
+            $map[$pid]['variants'][] = [
+                'id' => (int)$r['variant_id'],
+                'size' => $r['size'],
+                'color' => $r['color'],
+                'stock' => (int)$r['stock']
+            ];
+        }
+    }
+    $products = array_values($map);
+}
