@@ -169,3 +169,51 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
             }
         }
+
+            /** ---- USER: UPDATE CART ---- */
+        if ($action === 'update_cart') {
+            $cartId = (int)($_POST['cart_id'] ?? 0);
+            $qty = (int)($_POST['quantity'] ?? 1);
+
+            if ($cartId <= 0) $errors[] = "Cart item không hợp lệ.";
+
+            if (empty($errors)) {
+                // Ensure ownership + get stock
+                $stmt = mysqli_prepare($conn, "
+                    SELECT c.id, c.product_variant_id, v.stock
+                    FROM cart c
+                    JOIN product_variants v ON v.id = c.product_variant_id
+                    WHERE c.id = ? AND c.user_id = ?
+                    LIMIT 1
+                ");
+                mysqli_stmt_bind_param($stmt, "ii", $cartId, $userId);
+                mysqli_stmt_execute($stmt);
+                $row = mysqli_fetch_assoc(mysqli_stmt_get_result($stmt));
+                mysqli_stmt_close($stmt);
+
+                if (!$row) {
+                    $errors[] = "Không tìm thấy cart item.";
+                } else {
+                    $stock = (int)$row['stock'];
+
+                    if ($qty <= 0) {
+                        $stmt = mysqli_prepare($conn, "DELETE FROM cart WHERE id = ? AND user_id = ?");
+                        mysqli_stmt_bind_param($stmt, "ii", $cartId, $userId);
+                        mysqli_stmt_execute($stmt);
+                        mysqli_stmt_close($stmt);
+                        $success = "Đã xoá item khỏi giỏ.";
+                    } else {
+                        if ($qty > $stock) {
+                            $errors[] = "Tồn kho không đủ. Hiện còn $stock.";
+                        } else {
+                            $stmt = mysqli_prepare($conn, "UPDATE cart SET quantity = ?, updated_at = NOW() WHERE id = ? AND user_id = ?");
+                            mysqli_stmt_bind_param($stmt, "iii", $qty, $cartId, $userId);
+                            mysqli_stmt_execute($stmt);
+                            mysqli_stmt_close($stmt);
+                            $success = "Đã cập nhật giỏ hàng.";
+                        }
+                    }
+                    $page = 'cart';
+                }
+            }
+        }
