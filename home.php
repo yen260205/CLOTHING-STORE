@@ -217,3 +217,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
             }
         }
+
+        /** ---- USER: REMOVE CART ---- */
+        if ($action === 'remove_cart') {
+            $cartId = (int)($_POST['cart_id'] ?? 0);
+            if ($cartId <= 0) $errors[] = "Cart item không hợp lệ.";
+            if (empty($errors)) {
+                $stmt = mysqli_prepare($conn, "DELETE FROM cart WHERE id = ? AND user_id = ?");
+                mysqli_stmt_bind_param($stmt, "ii", $cartId, $userId);
+                mysqli_stmt_execute($stmt);
+                mysqli_stmt_close($stmt);
+                $success = "Đã xoá item khỏi giỏ.";
+                $page = 'cart';
+            }
+        }
