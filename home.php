@@ -660,3 +660,62 @@ if ($page === 'admin' && isAdmin()) {
         color:inherit;
         text-decoration:none
       }
+
+ /* ===== TOP BAR: SOLID (không trong suốt) ===== */
+      .topbar{
+        position:sticky;
+        top:0;
+        z-index:10;
+        background:#0d1424;          /* solid */
+        border-bottom:1px solid rgba(255,255,255,.10);
+        backdrop-filter:none;         /* bỏ blur glass */
+      }
+
+      .wrap{
+        max-width:1100px;
+        margin:0 auto;
+        padding:14px 16px
+      }
+
+      .row{
+        display:flex;
+        gap:12px;
+        align-items:center;
+        justify-content:space-between;
+        flex-wrap:wrap
+      }
+
+      .brand{
+        display:flex;
+        gap:10px;
+        align-items:center;
+        font-weight:800;
+        letter-spacing:.3px
+      }
+
+      /* pill + nav: SOLID */
+      .pill{
+        padding:6px 10px;
+        border-radius:999px;
+        border:1px solid rgba(255,255,255,.12);
+        background:#111c33; /* solid */
+        font-size:13px
+      }
+
+      .nav{
+        display:flex;
+        gap:10px;
+        flex-wrap:wrap
+      }
+
+      .nav a{
+        padding:8px 12px;
+        border-radius:10px;
+        border:1px solid rgba(255,255,255,.12);
+        background:#111c33; /* solid */
+      }
+
+      .nav a.active{
+        background:linear-gradient(135deg, rgba(102,126,234,.55), rgba(118,75,162,.55));
+        border-color:rgba(255,255,255,.18)
+      }
