@@ -740,3 +740,42 @@ if ($page === 'admin' && isAdmin()) {
       @media (max-width: 600px){
         .grid{ grid-template-columns:1fr }
       }
+
+/* IMGBOX: SOLID */
+      .imgbox{
+        height:170px;
+        border-radius:12px;
+        background:#0b1220; /* solid */
+        border:1px solid rgba(255,255,255,.12);
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        overflow:hidden
+      }
+      .imgbox img{
+        width:100%;
+        height:100%;
+        object-fit:cover
+      }
+
+      .muted{ opacity:.75 }
+
+      .h1{
+        font-size:20px;
+        font-weight:800;
+        margin:0
+      }
+      .price{
+        font-size:18px;
+        font-weight:800
+      }
+
+      .btn{
+        cursor:pointer;
+        border:none;
+        border-radius:12px;
+        padding:10px 12px;
+        background:linear-gradient(135deg,#667eea,#764ba2);
+        color:white;
+        font-weight:700
+      }
