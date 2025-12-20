@@ -719,3 +719,24 @@ if ($page === 'admin' && isAdmin()) {
         background:linear-gradient(135deg, rgba(102,126,234,.55), rgba(118,75,162,.55));
         border-color:rgba(255,255,255,.18)
       }
+
+/* ===== CARD: SOLID ===== */
+      .card{
+        background:#0f172a; /* solid */
+        border:1px solid rgba(255,255,255,.12);
+        border-radius:16px;
+        padding:14px
+      }
+
+      .grid{
+        display:grid;
+        grid-template-columns:repeat(3,1fr);
+        gap:14px
+      }
+
+      @media (max-width: 900px){
+        .grid{ grid-template-columns:repeat(2,1fr) }
+      }
+      @media (max-width: 600px){
+        .grid{ grid-template-columns:1fr }
+      }
