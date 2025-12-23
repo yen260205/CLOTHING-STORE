@@ -789,3 +789,40 @@ if ($page === 'admin' && isAdmin()) {
         background:#2a1212;
         border:1px solid rgba(255,80,80,.35)
       }
+
+/* INPUT/SELECT/TEXTAREA: SOLID */
+      input,select,textarea{
+        width:100%;
+        padding:10px;
+        border-radius:12px;
+        border:1px solid rgba(255,255,255,.12);
+        background:#0b1220; /* solid */
+        color:#e7eaf0;
+        outline:none
+      }
+      textarea{
+        min-height:90px;
+        resize:vertical
+      }
+
+      .msg{
+        margin:12px 0;
+        padding:12px;
+        border-radius:12px;
+        border:1px solid
+      }
+      .msg.ok{
+        background:#10251b;
+        border-color:rgba(60,200,120,.35)
+      }
+      .msg.err{
+        background:#2a1212;
+        border-color:rgba(255,80,80,.30)
+      }
+
+      table{
+        width:100%;
+        border-collapse:separate;
+        border-spacing:0 10px
+      }
+      td,th{ padding:10px }
