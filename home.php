@@ -779,3 +779,13 @@ if ($page === 'admin' && isAdmin()) {
         color:white;
         font-weight:700
       }
+
+/* Buttons phụ: cũng solid cho đồng bộ */
+      .btn.secondary{
+        background:#111c33;
+        border:1px solid rgba(255,255,255,.12)
+      }
+      .btn.danger{
+        background:#2a1212;
+        border:1px solid rgba(255,80,80,.35)
+      }
