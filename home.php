@@ -826,3 +826,33 @@ if ($page === 'admin' && isAdmin()) {
         border-spacing:0 10px
       }
       td,th{ padding:10px }
+      /* TABLE ROW: SOLID */
+      tr{
+        background:#0f172a; /* solid */
+        border:1px solid rgba(255,255,255,.12)
+      }
+      tr td:first-child, tr th:first-child{
+        border-top-left-radius:12px;
+        border-bottom-left-radius:12px
+      }
+      tr td:last-child, tr th:last-child{
+        border-top-right-radius:12px;
+        border-bottom-right-radius:12px
+      }
+
+      .two{
+        display:grid;
+        grid-template-columns:1fr 1fr;
+        gap:12px
+      }
+      @media (max-width: 800px){
+        .two{ grid-template-columns:1fr }
+      }
+
+      .small{ font-size:13px }
+    </style>
+
+
+
+</head>
+<body>
