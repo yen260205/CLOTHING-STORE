@@ -856,3 +856,24 @@ if ($page === 'admin' && isAdmin()) {
 
 </head>
 <body>
+
+<div class="topbar">
+  <div class="wrap">
+    <div class="row">
+      <div class="brand">
+        <span style="font-size:18px;">🛍️</span>
+        <span>Clothing Store</span>
+        <span class="pill small"><?php echo e($_SESSION['full_name'] ?? ''); ?> (<?php echo e($_SESSION['role'] ?? 'user'); ?>)</span>
+      </div>
+      <div class="nav">
+        <a class="<?php echo $page==='products'?'active':''; ?>" href="home.php?page=products">Products</a>
+        <a class="<?php echo $page==='cart'?'active':''; ?>" href="home.php?page=cart">Cart</a>
+        <a class="<?php echo $page==='orders'?'active':''; ?>" href="home.php?page=orders">Orders</a>
+        <?php if (isAdmin()): ?>
+          <a class="<?php echo $page==='admin'?'active':''; ?>" href="home.php?page=admin">Admin</a>
+        <?php endif; ?>
+        <a href="logout.php" class="btn secondary" style="padding:8px 12px;">Logout</a>
+      </div>
+    </div>
+  </div>
+</div>
