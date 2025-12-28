@@ -877,3 +877,18 @@ if ($page === 'admin' && isAdmin()) {
     </div>
   </div>
 </div>
+
+<div class="wrap">
+  <?php if ($success): ?>
+    <div class="msg ok"><?php echo e($success); ?></div>
+  <?php endif; ?>
+  <?php if (!empty($errors)): ?>
+    <div class="msg err">
+      <div style="font-weight:800;margin-bottom:6px;">Có lỗi:</div>
+      <ul style="margin:0 0 0 18px;">
+        <?php foreach ($errors as $er): ?>
+          <li><?php echo e($er); ?></li>
+        <?php endforeach; ?>
+      </ul>
+    </div>
+  <?php endif; ?>
