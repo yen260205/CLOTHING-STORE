@@ -937,3 +937,21 @@ if ($page === 'admin' && isAdmin()) {
             <input type="hidden" name="variant_id" value="" class="js-variant-id">
 
             <div class="two">
+             <!-- Dropdown cho Size -->
+              <div>
+                <label class="small muted">Size</label>
+                <select name="size" class="js-size" required>
+                  <option value="">Chọn kích thước</option>
+                  <?php
+                    $sizeSet = [];
+                    foreach ($p['variants'] as $v) {
+                      if ((int)$v['stock'] > 0) { $sizeSet[$v['size']] = true; }
+                    }
+                    $sizes = array_keys($sizeSet);
+                    sort($sizes);
+                  ?>
+                  <?php foreach ($sizes as $s): ?>
+                    <option value="<?php echo e($s); ?>"><?php echo e($s); ?></option>
+                  <?php endforeach; ?>
+                </select>
+              </div>
