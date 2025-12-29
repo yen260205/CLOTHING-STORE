@@ -892,3 +892,48 @@ if ($page === 'admin' && isAdmin()) {
       </ul>
     </div>
   <?php endif; ?>
+
+<!-- ================= PRODUCTS ================= -->
+  <?php if ($page === 'products'): ?>
+    <div class="row" style="margin-bottom:12px;">
+      <h2 class="h1">Products</h2>
+      <div class="muted small">Chọn variant (size/color) rồi Add to cart.</div>
+    </div>
+
+    <div class="grid">
+      <?php foreach ($products as $p): ?>
+        <div class="card">
+          <div class="imgbox">
+            <?php
+              $img = $p['image'] ? ('uploads/products/' . $p['image']) : '';
+              if ($img && file_exists($img)) {
+                echo '<img src="'.e($img).'" alt="product">';
+              } else {
+                echo '<div class="muted small">No image</div>';
+              }
+            ?>
+          </div>
+
+          <div style="margin-top:12px;display:flex;justify-content:space-between;gap:10px;align-items:flex-start;">
+            <div>
+              <div style="font-weight:800"><?php echo e($p['name']); ?></div>
+              <div class="muted small">
+                <?php echo e($p['brand'] ?: ''); ?> <?php echo e($p['type'] ? ('• '.$p['type']) : ''); ?>
+              </div>
+            </div>
+            <div class="price"><?php echo number_format($p['price'], 0, ',', '.'); ?>₫</div>
+          </div>
+
+          <?php if ($p['description']): ?>
+            <div class="muted small" style="margin-top:8px;">
+              <?php echo e(mb_strlen($p['description'])>120 ? mb_substr($p['description'],0,120).'...' : $p['description']); ?>
+            </div>
+          <?php endif; ?>
+
+          <form method="POST" style="margin-top:12px;" class="add-cart-form" data-variants="<?php echo e(json_encode($p['variants'], JSON_UNESCAPED_UNICODE)); ?>">
+            <input type="hidden" name="csrf_token" value="<?php echo e(csrf_token()); ?>">
+            <input type="hidden" name="action" value="add_to_cart">
+            <input type="hidden" name="product_id" value="<?php echo (int)$p['id']; ?>">
+            <input type="hidden" name="variant_id" value="" class="js-variant-id">
+
+            <div class="two">
