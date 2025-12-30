@@ -990,6 +990,82 @@ if ($page === 'admin' && isAdmin()) {
       <?php endforeach; ?>
     </div>
   <?php endif; ?>
+ <!-- ================= CART ================= -->
+  <?php if ($page === 'cart'): ?>
+    <div class="row" style="margin-bottom:12px;">
+      <h2 class="h1">Cart</h2>
+      <div class="pill">Total: <b><?php echo number_format($cartTotal, 0, ',', '.'); ?>₫</b></div>
+    </div>
+
+    <?php if (empty($cartItems)): ?>
+      <div class="card muted">Giỏ hàng trống.</div>
+    <?php else: ?>
+      <div class="card">
+        <table>
+          <thead class="muted small">
+            <tr>
+              <th align="left">Item</th>
+              <th align="left">Variant</th>
+              <th align="right">Price</th>
+              <th align="center">Qty</th>
+              <th align="right">Subtotal</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+          <?php foreach ($cartItems as $it): ?>
+            <?php
+              $sub = ((float)$it['price']) * ((int)$it['quantity']);
+              $warning = ((int)$it['quantity'] > (int)$it['stock']);
+            ?>
+            <tr>
+              <td>
+                <div style="font-weight:800"><?php echo e($it['name']); ?></div>
+                <?php if ($warning): ?>
+                  <div class="small" style="color:#ff9a9a;">Vượt tồn kho (stock: <?php echo (int)$it['stock']; ?>)</div>
+                <?php else: ?>
+                  <div class="muted small">stock: <?php echo (int)$it['stock']; ?></div>
+                <?php endif; ?>
+              </td>
+              <td class="muted"><?php echo e($it['size'].' / '.$it['color']); ?></td>
+              <td align="right"><?php echo number_format((float)$it['price'], 0, ',', '.'); ?>₫</td>
+              <td align="center" style="min-width:170px;">
+                <form method="POST" style="display:flex;gap:8px;align-items:center;justify-content:center;">
+                  <input type="hidden" name="csrf_token" value="<?php echo e(csrf_token()); ?>">
+                  <input type="hidden" name="action" value="update_cart">
+                  <input type="hidden" name="cart_id" value="<?php echo (int)$it['cart_id']; ?>">
+                  <input type="number" name="quantity" min="0" value="<?php echo (int)$it['quantity']; ?>" style="width:90px;">
+                  <button class="btn secondary" type="submit" style="padding:8px 10px;">Update</button>
+                </form>
+                <div class="small muted">(Qty=0 sẽ xoá)</div>
+              </td>
+              <td align="right"><?php echo number_format($sub, 0, ',', '.'); ?>₫</td>
+              <td align="right">
+                <form method="POST">
+                  <input type="hidden" name="csrf_token" value="<?php echo e(csrf_token()); ?>">
+                  <input type="hidden" name="action" value="remove_cart">
+                  <input type="hidden" name="cart_id" value="<?php echo (int)$it['cart_id']; ?>">
+                  <button class="btn danger" type="submit">Remove</button>
+                </form>
+              </td>
+            </tr>
+          <?php endforeach; ?>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card" style="margin-top:14px;">
+        <h3 style="margin:0 0 10px 0;">Checkout</h3>
+        <form method="POST">
+          <input type="hidden" name="csrf_token" value="<?php echo e(csrf_token()); ?>">
+          <input type="hidden" name="action" value="checkout">
+          <label class="small muted">Note (tuỳ chọn)</label>
+          <textarea name="note" placeholder="Ghi chú đơn hàng..."></textarea>
+          <button class="btn" style="margin-top:10px;">Place order (Total: <?php echo number_format($cartTotal, 0, ',', '.'); ?>₫)</button>
+        </form>
+      </div>
+    <?php endif; ?>
+  <?php endif; ?>
 
 
            
