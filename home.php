@@ -955,3 +955,41 @@ if ($page === 'admin' && isAdmin()) {
                   <?php endforeach; ?>
                 </select>
               </div>
+               <!-- Dropdown cho Color -->
+              <div>
+                <label class="small muted">Color</label>
+                <select name="color" class="js-color" required disabled>
+                  <option value="">Chọn màu</option>
+                  <?php
+                    $colorSet = [];
+                    foreach ($p['variants'] as $v) {
+                      if ((int)$v['stock'] > 0) { $colorSet[$v['color']] = true; }
+                    }
+                    $colors = array_keys($colorSet);
+                    sort($colors);
+                  ?>
+                  <?php foreach ($colors as $c): ?>
+                    <option value="<?php echo e($c); ?>"><?php echo e($c); ?></option>
+                  <?php endforeach; ?>
+                </select>
+              </div>
+            </div>
+
+            <div class="small muted js-variant-hint" style="margin-top:6px;"></div>
+
+            <div>
+              <label class="small muted">Qty</label>
+              <input type="number" name="quantity" min="1" value="1" required />
+            </div>
+
+            <button class="btn" style="margin-top:10px;">
+              Add to cart
+            </button>
+          </form>
+        </div>
+      <?php endforeach; ?>
+    </div>
+  <?php endif; ?>
+
+
+           
