@@ -1066,6 +1066,30 @@ if ($page === 'admin' && isAdmin()) {
       </div>
     <?php endif; ?>
   <?php endif; ?>
+<!-- ================= ORDERS ================= -->
+  <?php if ($page === 'orders'): ?>
+    <div class="row" style="margin-bottom:12px;">
+      <h2 class="h1">Orders</h2>
+      <div class="muted small">Lịch sử đơn hàng của bạn (50 đơn gần nhất).</div>
+    </div>
+
+    <?php if (empty($orders)): ?>
+      <div class="card muted">Chưa có đơn hàng nào.</div>
+    <?php else: ?>
+      <?php foreach ($orders as $od): ?>
+        <div class="card" style="margin-bottom:12px;">
+          <div class="row">
+            <div>
+              <div style="font-weight:900">Order #<?php echo (int)$od['id']; ?></div>
+              <div class="muted small"><?php echo e($od['created_at']); ?> • Status: <b><?php echo e($od['status']); ?></b></div>
+            </div>
+            <div class="pill">Total: <b><?php echo number_format((float)$od['total'], 0, ',', '.'); ?>₫</b></div>
+          </div>
+          <?php if (!empty($od['note'])): ?>
+            <div class="muted small" style="margin-top:8px;">Note: <?php echo e($od['note']); ?></div>
+          <?php endif; ?>
+
+          <?php
 
 
            
