@@ -1090,6 +1090,40 @@ if ($page === 'admin' && isAdmin()) {
           <?php endif; ?>
 
           <?php
+  // order lines
+            $stmt = mysqli_prepare($conn, "
+              SELECT od.quantity, od.price,
+                     v.size, v.color,
+                     p.name
+              FROM order_detail od
+              JOIN product_variants v ON v.id = od.product_variant_id
+              JOIN products p ON p.id = v.product_id
+              WHERE od.order_id = ?
+              ORDER BY od.id ASC
+            ");
+            $oid = (int)$od['id'];
+            mysqli_stmt_bind_param($stmt, "i", $oid);
+            mysqli_stmt_execute($stmt);
+            $lines = stmt_fetch_all($stmt);
+            mysqli_stmt_close($stmt);
+          ?>
+          <div style="margin-top:10px;">
+            <div class="muted small" style="margin-bottom:6px;">Items:</div>
+            <ul style="margin:0 0 0 18px;">
+              <?php foreach ($lines as $ln): ?>
+                <li class="small">
+                  <b><?php echo e($ln['name']); ?></b>
+                  (<?php echo e($ln['size'].'/'.$ln['color']); ?>)
+                  — Qty: <?php echo (int)$ln['quantity']; ?>
+                  — Price: <?php echo number_format((float)$ln['price'], 0, ',', '.'); ?>₫
+                </li>
+              <?php endforeach; ?>
+            </ul>
+          </div>
+        </div>
+      <?php endforeach; ?>
+    <?php endif; ?>
+  <?php endif; ?>
 
 
            
