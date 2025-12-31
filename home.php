@@ -1125,5 +1125,246 @@ if ($page === 'admin' && isAdmin()) {
     <?php endif; ?>
   <?php endif; ?>
 
+  <!-- ================= ADMIN ================= -->
+  <?php if ($page === 'admin'): ?>
+    <?php if (!isAdmin()): ?>
+      <div class="card">Bạn không có quyền admin.</div>
+    <?php else: ?>
+      <div class="row" style="margin-bottom:12px;">
+        <h2 class="h1">Admin</h2>
+        <div class="muted small">Quản lý products + variants (size/color/stock).</div>
+      </div>
 
+      <div class="two">
+        <div class="card">
+          <h3 style="margin:0 0 10px 0;">Add product</h3>
+          <form method="POST" enctype="multipart/form-data">
+            <input type="hidden" name="csrf_token" value="<?php echo e(csrf_token()); ?>">
+            <input type="hidden" name="action" value="admin_add_product">
+
+            <label class="small muted">Name</label>
+            <input name="name" placeholder="Tên sản phẩm" />
+
+            <div class="two" style="margin-top:10px;">
+              <div>
+                <label class="small muted">Price</label>
+                <input name="price" type="number" step="0.01" placeholder="Giá" />
+              </div>
+              <div>
+                <label class="small muted">Stock (initial)</label>
+                <input name="stock" type="number" min="0" value="0" />
+              </div>
+            </div>
+
+            <div class="two" style="margin-top:10px;">
+              <div>
+                <label class="small muted">Type</label>
+                <input name="type" placeholder="VD: Tshirt" />
+              </div>
+              <div>
+                <label class="small muted">Brand</label>
+                <input name="brand" placeholder="VD: Nike" />
+              </div>
+            </div>
+
+            <div class="two" style="margin-top:10px;">
+              <div>
+                <label class="small muted">Variant size</label>
+                <input name="size" placeholder="VD: M" value="FREE" />
+              </div>
+              <div>
+                <label class="small muted">Variant color</label>
+                <input name="color" placeholder="VD: Black" value="DEFAULT" />
+              </div>
+            </div>
+
+            <label class="small muted" style="margin-top:10px;">Description</label>
+            <textarea name="description" placeholder="Mô tả..."></textarea>
+
+            <label class="small muted" style="margin-top:10px;">Image</label>
+            <input type="file" name="product_image" accept="image/*"/>
+
+            <button class="btn" style="margin-top:10px;">Add</button>
+          </form>
+        </div>
+
+        <div class="card">
+          <h3 style="margin:0 0 10px 0;">Manage products</h3>
+          <?php if (empty($products)): ?>
+            <div class="muted">Chưa có sản phẩm.</div>
+          <?php else: ?>
+            <?php foreach ($products as $p): ?>
+              <div class="card" style="margin-bottom:10px;">
+                <div class="row">
+                  <div>
+                    <div style="font-weight:900">#<?php echo (int)$p['id']; ?> — <?php echo e($p['name']); ?></div>
+                    <div class="muted small"><?php echo number_format($p['price'], 0, ',', '.'); ?>₫ • <?php echo e($p['brand'] ?: ''); ?> <?php echo e($p['type'] ? ('• '.$p['type']) : ''); ?></div>
+                  </div>
+                  <form method="POST" onsubmit="return confirm('Xoá product này?');">
+                    <input type="hidden" name="csrf_token" value="<?php echo e(csrf_token()); ?>">
+                    <input type="hidden" name="action" value="admin_delete_product">
+                    <input type="hidden" name="product_id" value="<?php echo (int)$p['id']; ?>">
+                    <button class="btn danger" type="submit">Delete</button>
+                  </form>
+                </div>
+
+                <details style="margin-top:10px;">
+                  <summary class="small" style="cursor:pointer;">Edit product + Variants</summary>
+
+                  <div style="margin-top:10px;">
+                    <form method="POST" enctype="multipart/form-data">
+                      <input type="hidden" name="csrf_token" value="<?php echo e(csrf_token()); ?>">
+                      <input type="hidden" name="action" value="admin_update_product">
+                      <input type="hidden" name="product_id" value="<?php echo (int)$p['id']; ?>">
+
+                      <div class="two">
+                        <div>
+                          <label class="small muted">Name</label>
+                          <input name="name" value="<?php echo e($p['name']); ?>" />
+                        </div>
+                        <div>
+                          <label class="small muted">Price</label>
+                          <input name="price" type="number" step="0.01" value="<?php echo e($p['price']); ?>" />
+                        </div>
+                      </div>
+
+                      <div class="two" style="margin-top:10px;">
+                        <div>
+                          <label class="small muted">Type</label>
+                          <input name="type" value="<?php echo e($p['type'] ?? ''); ?>" />
+                        </div>
+                        <div>
+                          <label class="small muted">Brand</label>
+                          <input name="brand" value="<?php echo e($p['brand'] ?? ''); ?>" />
+                        </div>
+                      </div>
+
+                      <label class="small muted" style="margin-top:10px;">Description</label>
+                      <textarea name="description"><?php echo e($p['description'] ?? ''); ?></textarea>
+
+                      <label class="small muted" style="margin-top:10px;">Replace image (optional)</label>
+                      <input type="file" name="product_image" accept="image/*"/>
+
+                      <button class="btn secondary" style="margin-top:10px;">Save product</button>
+                    </form>
+                  </div>
+
+                  <div style="margin-top:14px;">
+                    <div class="muted small" style="margin-bottom:8px;">Variants</div>
+
+                    <?php if (empty($p['variants'])): ?>
+                      <div class="muted small">Chưa có variant.</div>
+                    <?php else: ?>
+                      <?php
+                    $colorSet = [];
+                    foreach ($p['variants'] as $v) {
+                      if ((int)$v['stock'] > 0) { $colorSet[$v['color']] = true; }
+                    }
+                    $colors = array_keys($colorSet);
+                    sort($colors);
+                  ?>
+                  <?php foreach ($colors as $c): ?>
+                    <option value="<?php echo e($c); ?>"><?php echo e($c); ?></option>
+                  <?php endforeach; ?>
+                    <?php endif; ?>
+
+                    <div class="card" style="margin-top:10px;">
+                      <div class="muted small" style="margin-bottom:8px;">Add variant</div>
+                      <form method="POST">
+                        <input type="hidden" name="csrf_token" value="<?php echo e(csrf_token()); ?>">
+                        <input type="hidden" name="action" value="admin_add_variant">
+                        <input type="hidden" name="product_id" value="<?php echo (int)$p['id']; ?>">
+
+                        <div class="two">
+                          <div>
+                            <label class="small muted">Size</label>
+                            <input name="size" placeholder="VD: L" />
+                          </div>
+                          <div>
+                            <label class="small muted">Color</label>
+                            <input name="color" placeholder="VD: White" />
+                          </div>
+                        </div>
+
+                        <label class="small muted" style="margin-top:10px;">Stock</label>
+                        <input type="number" name="stock" min="0" value="0" />
+
+                        <button class="btn" style="margin-top:10px;">Add variant</button>
+                      </form>
+                    </div>
+
+                  </div>
+                </details>
+
+              </div>
+            <?php endforeach; ?>
+          <?php endif; ?>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:14px;">
+        <div class="row" style="margin-bottom:10px;">
+          <h3 style="margin:0;">Đơn hàng user đã đặt</h3>
+          <div class="muted small">Hiển thị <?php echo count($adminOrders); ?> đơn gần nhất.</div>
+        </div>
+
+        <?php if (empty($adminOrders)): ?>
+          <div class="muted small">Chưa có đơn hàng nào.</div>
+        <?php else: ?>
+          <?php foreach ($adminOrders as $od): ?>
+            <div style="padding:10px 0;border-top:1px solid rgba(255,255,255,.06);">
+              <div class="row">
+                <div>
+                  <div style="font-weight:900">Order #<?php echo (int)$od['id']; ?></div>
+                  <div class="muted small">
+                    <?php echo e($od['created_at']); ?> • Status: <b><?php echo e($od['status']); ?></b>
+                    • User: <?php echo e($od['user_name']); ?> (<?php echo e($od['user_email']); ?>)
+                  </div>
+                </div>
+                <div class="pill">Total: <b><?php echo number_format((float)$od['total'], 0, ',', '.'); ?>₫</b></div>
+              </div>
+
+              <?php if (!empty($od['note'])): ?>
+                <div class="muted small" style="margin-top:8px;">Note: <?php echo e($od['note']); ?></div>
+              <?php endif; ?>
+
+              <?php
+                // order lines
+                $stmt = mysqli_prepare($conn, "
+                  SELECT od.quantity, od.price,
+                        v.size, v.color,
+                        p.name
+                  FROM order_detail od
+                  JOIN product_variants v ON v.id = od.product_variant_id
+                  JOIN products p ON p.id = v.product_id
+                  WHERE od.order_id = ?
+                ");
+                mysqli_stmt_bind_param($stmt, "i", $od['id']);
+                mysqli_stmt_execute($stmt);
+                $lines = stmt_fetch_all($stmt);
+                mysqli_stmt_close($stmt);
+              ?>
+
+              <?php if (!empty($lines)): ?>
+                <div class="muted small" style="margin-top:8px;">Items:</div>
+                <ul style="margin:0 0 0 18px;">
+                  <?php foreach ($lines as $ln): ?>
+                    <li class="small">
+                      <b><?php echo e($ln['name']); ?></b>
+                      (<?php echo e($ln['size'].'/'.$ln['color']); ?>)
+                      — Qty: <?php echo (int)$ln['quantity']; ?>
+                      — Price: <?php echo number_format((float)$ln['price'], 0, ',', '.'); ?>₫
+                    </li>
+                  <?php endforeach; ?>
+                </ul>
+              <?php endif; ?>
+            </div>
+          <?php endforeach; ?>
+        <?php endif; ?>
+      </div>
+
+    <?php endif; ?>
+  <?php endif; ?>
+
+</div>
            
