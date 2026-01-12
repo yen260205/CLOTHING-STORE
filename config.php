@@ -61,4 +61,3 @@ function csrf_token(): string {
 }
 function csrf_validate($token): bool {
     return isset($_SESSION['csrf_token']) && is_string($token) && hash_equals($_SESSION['csrf_token'], $token);
-}
