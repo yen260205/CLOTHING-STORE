@@ -130,3 +130,18 @@ function local_file_exists(string $src): bool {
     $p = __DIR__ . '/' . ltrim($src, '/');
     return file_exists($p);
 }
+
+/ Giảm sai số float: tính tiền theo cents nội bộ, lưu DB dạng DECIMAL string.
+function price_to_cents($price): int {
+    return (int)round(((float)$price) * 100);
+}
+function cents_to_decimal_string(int $cents): string {
+    return number_format($cents / 100, 2, '.', '');
+}
+
+function redirect_home_with_flash(string $page, array $errs = [], string $ok = ''): void {
+    if (!empty($errs)) $_SESSION['flash_errors'] = $errs;
+    if ($ok !== '') $_SESSION['flash_success'] = $ok;
+    header('Location: home.php?page=' . urlencode($page));
+    exit;
+}
