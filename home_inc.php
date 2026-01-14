@@ -82,3 +82,22 @@ function save_uploaded_image(string $field, array &$errors): ?string {
 
     return 'uploads/products/' . $filename;
 }
+
+
+
+/** =========================
+ *  FLASH (PRG) + HELPERS
+ *  ========================= */
+if (!empty($_SESSION['flash_errors']) && is_array($_SESSION['flash_errors'])) {
+    $errors = $_SESSION['flash_errors'];
+    unset($_SESSION['flash_errors']);
+}
+if (!empty($_SESSION['flash_success']) && is_string($_SESSION['flash_success'])) {
+    $success = $_SESSION['flash_success'];
+    unset($_SESSION['flash_success']);
+}
+
+function starts_with(string $haystack, string $needle): bool {
+    $n = strlen($needle);
+    return $n === 0 || strncmp($haystack, $needle, $n) === 0;
+}
