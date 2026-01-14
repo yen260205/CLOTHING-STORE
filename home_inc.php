@@ -47,3 +47,38 @@ function save_uploaded_image(string $field, array &$errors): ?string {
         $errors[] = "File upload không hợp lệ.";
         return null;
     }
+
+ // Check mime thật (không tin ext)
+    $finfo = finfo_open(FILEINFO_MIME_TYPE);
+    $mime = $finfo ? finfo_file($finfo, $tmp) : null;
+    if ($finfo) finfo_close($finfo);
+
+    $extMap = [
+        'image/jpeg' => 'jpg',
+        'image/png'  => 'png',
+        'image/webp' => 'webp',
+        'image/gif'  => 'gif',
+    ];
+    if (!$mime || !isset($extMap[$mime])) {
+        $errors[] = "Định dạng ảnh không được hỗ trợ (jpg/png/webp/gif).";
+        return null;
+    }
+
+    $uploadDir = __DIR__ . '/uploads/products';
+    if (!is_dir($uploadDir)) {
+        if (!mkdir($uploadDir, 0755, true)) {
+            $errors[] = "Không tạo được thư mục uploads/products.";
+            return null;
+        }
+    }
+
+    $filename = 'p_' . bin2hex(random_bytes(8)) . '.' . $extMap[$mime];
+    $dest = $uploadDir . '/' . $filename;
+
+    if (!move_uploaded_file($tmp, $dest)) {
+        $errors[] = "Lưu ảnh thất bại.";
+        return null;
+    }
+
+    return 'uploads/products/' . $filename;
+}
