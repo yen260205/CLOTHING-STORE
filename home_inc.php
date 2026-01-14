@@ -101,3 +101,32 @@ function starts_with(string $haystack, string $needle): bool {
     $n = strlen($needle);
     return $n === 0 || strncmp($haystack, $needle, $n) === 0;
 }
+
+/**
+ * Chuẩn hoá đường dẫn ảnh sản phẩm để tương thích cả DB cũ và mới.
+ * - Nếu DB lưu "uploads/products/xxx.jpg" => dùng thẳng
+ * - Nếu DB lưu "uploads/xxx.jpg" => dùng thẳng
+ * - Nếu DB chỉ lưu "xxx.jpg" => auto prefix "uploads/products/"
+ */
+function resolve_product_image_src(?string $dbValue): string {
+    $v = trim((string)$dbValue);
+    if ($v === '') return '';
+
+    // Nếu là URL ngoài
+    if (preg_match('~^https?://~i', $v)) return $v;
+
+    $v = ltrim($v, '/');
+
+    if (starts_with($v, 'uploads/')) {
+        return $v;
+    }
+
+    return 'uploads/products/' . $v;
+}
+
+function local_file_exists(string $src): bool {
+    if ($src === '') return false;
+    if (preg_match('~^https?://~i', $src)) return true; // không check được file ngoài
+    $p = __DIR__ . '/' . ltrim($src, '/');
+    return file_exists($p);
+}
